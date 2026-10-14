@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NYC Airbnb room type predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+<svg class="skyline" id="skyline" viewBox="0 0 1600 400" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+
+<div class="page">
+  <header class="hero">
+    <div class="status" id="apiStatus"><i class="dot"></i><span>Checking server</span></div>
+    <h1>Whole place, private room, or a shared one?</h1>
+    <p>Describe any New York Airbnb listing. The model reads the price, location, reviews and availability, then tells you what kind of stay it is.</p>
+  </header>
+
+  <main class="grid">
+    <section class="card" aria-labelledby="formTitle">
+      <div class="card-head">
+        <h2 id="formTitle">Listing details</h2>
+        <button type="button" class="ghost" id="exampleBtn">Fill an example</button>
+      </div>
+
+      <form id="predictForm" novalidate>
+        <fieldset>
+          <legend>Where is it?</legend>
+          <div class="boroughs" role="radiogroup" aria-label="Borough">
+            <label><input type="radio" name="neighbourhood_group" value="Manhattan" required><span>Manhattan</span></label>
+            <label><input type="radio" name="neighbourhood_group" value="Brooklyn"><span>Brooklyn</span></label>
+            <label><input type="radio" name="neighbourhood_group" value="Queens"><span>Queens</span></label>
+            <label><input type="radio" name="neighbourhood_group" value="Bronx"><span>Bronx</span></label>
+            <label><input type="radio" name="neighbourhood_group" value="Staten Island"><span>Staten Island</span></label>
+          </div>
+          <div class="field">
+            <label for="neighbourhood">Neighbourhood</label>
+            <input type="text" id="neighbourhood" name="neighbourhood" list="hoods" placeholder="Pick a borough, then type or choose" autocomplete="off" required>
+            <datalist id="hoods"></datalist>
+          </div>
+          <div class="row">
+            <div class="field"><label for="latitude">Latitude</label>
+              <input type="number" id="latitude" name="latitude" step="any" min="-90" max="90" placeholder="40.7128" required></div>
+            <div class="field"><label for="longitude">Longitude</label>
+              <input type="number" id="longitude" name="longitude" step="any" min="-180" max="180" placeholder="-74.0060" required></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Price and availability</legend>
+          <div class="row">
+            <div class="field"><label for="price">Price per night</label>
+              <div class="prefix"><span>$</span><input type="number" id="price" name="price" min="1" step="1" placeholder="150" required></div></div>
+            <div class="field"><label for="minimum_nights">Minimum nights</label>
+              <input type="number" id="minimum_nights" name="minimum_nights" min="1" max="365" step="1" placeholder="3" required></div>
+          </div>
+          <div class="field">
+            <label for="availability_365">Days available per year <b class="readout"><span id="availabilityValue">180</span> / 365</b></label>
+            <input type="range" id="availability_365" name="availability_365" min="0" max="365" step="1" value="180">
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Reviews and host</legend>
+          <div class="row">
+            <div class="field"><label for="number_of_reviews">Total reviews</label>
+              <input type="number" id="number_of_reviews" name="number_of_reviews" min="0" step="1" placeholder="24" required></div>
+            <div class="field"><label for="reviews_per_month">Reviews per month</label>
+              <input type="number" id="reviews_per_month" name="reviews_per_month" min="0" step="0.01" placeholder="1.2" required></div>
+          </div>
+          <div class="field"><label for="calculated_host_listings_count">Listings by this host</label>
+            <input type="number" id="calculated_host_listings_count" name="calculated_host_listings_count" min="0" step="1" placeholder="1" required></div>
+        </fieldset>
+
+        <button type="submit" class="go" id="predictBtn"><span class="spin"></span><span id="btnLabel">Predict room type</span></button>
+        <p class="note" id="formNote" role="status"></p>
+        <p class="error" id="formError" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="card result" aria-labelledby="resultTitle" aria-live="polite">
+      <div class="card-head"><h2 id="resultTitle">Prediction</h2></div>
+
+      <div class="empty" id="resultEmpty">
+        <div class="ring-ghost" aria-hidden="true"><i></i></div>
+        <p>Your result shows up here. Fill in the listing and press predict.</p>
+      </div>
+
+      <div id="resultContent" hidden>
+        <div class="gauge-wrap" id="gaugeWrap">
+          <svg class="gauge" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="g-bg" cx="100" cy="100" r="84"/>
+            <circle class="g-fg" id="gFg" cx="100" cy="100" r="84" transform="rotate(-90 100 100)"/>
+          </svg>
+          <div class="g-center">
+            <svg class="g-icon" id="gIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+            <em id="gPct">0%</em>
+            <span id="gLabel"></span>
+          </div>
+        </div>
+        <p class="verdict" id="verdict"></p>
+        <p class="sub" id="verdictSub"></p>
+        <div class="rows" id="rows"></div>
+      </div>
+
+    </section>
+  </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
